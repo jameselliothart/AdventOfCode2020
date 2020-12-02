@@ -1,16 +1,17 @@
 ﻿// Learn more about F# at http://fsharp.org
 
 open System
-open Day1
 open System.IO
-
+open Day1
+open Day2
 
 [<EntryPoint>]
 let main argv =
-    let entries = File.ReadAllLines "../../Data/Day1.txt"
+    let entries = File.ReadAllLines "../../Data/Day2.txt"
 
     entries
-    |> Array.map int
-    |> productOfThree2020Entries
+    |> Array.map checkPasswordLine
+    |> Array.filter (Option.exists id)
+    |> Array.length
     |> printfn "%i"
     0 // return an integer exit code
