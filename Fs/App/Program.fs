@@ -10,7 +10,7 @@ let main argv =
     let entries = File.ReadAllLines "../../Data/Day2.txt"
 
     entries
-    |> Array.map checkPasswordLine
+    |> Array.map checkPasswordLineOfficial
     |> Array.filter (Option.exists id)
     |> Array.length
     |> printfn "%i"

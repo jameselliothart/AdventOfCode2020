@@ -29,4 +29,13 @@ let goodPassword policy password =
     |> Seq.length
     |> fun n -> policy.Min <= n && n <= policy.Max
 
+let goodPasswordOfficial policy password =
+    let pwArray = password |> Seq.toArray
+    match ( pwArray.[policy.Min-1] = policy.Letter, pwArray.[policy.Max-1] = policy.Letter ) with
+    | ( true, true ) -> false
+    | ( false, false ) -> false
+    | ( true, false ) -> true
+    | ( false, true ) -> true
+
 let checkPasswordLine = parse >> Option.map (fun y -> goodPassword (fst y) (snd y))
+let checkPasswordLineOfficial = parse >> Option.map (fun y -> goodPasswordOfficial (fst y) (snd y))
