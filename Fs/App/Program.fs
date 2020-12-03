@@ -4,14 +4,13 @@ open System
 open System.IO
 open Day1
 open Day2
+open Day3
 
 [<EntryPoint>]
 let main argv =
-    let entries = File.ReadAllLines "../../Data/Day2.txt"
+    let entries = File.ReadAllLines "../../Data/Day3.txt"
 
     entries
-    |> Array.map checkPasswordLineOfficial
-    |> Array.filter (Option.exists id)
-    |> Array.length
+    |> solve
     |> printfn "%i"
     0 // return an integer exit code
