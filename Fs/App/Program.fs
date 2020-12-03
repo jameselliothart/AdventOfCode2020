@@ -10,7 +10,8 @@ open Day3
 let main argv =
     let entries = File.ReadAllLines "../../Data/Day3.txt"
 
-    entries
-    |> solve
+    slopes
+    |> Array.Parallel.map (traverse entries initialCount)
+    |> Array.reduce (*)
     |> printfn "%i"
     0 // return an integer exit code

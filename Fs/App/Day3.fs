@@ -16,12 +16,15 @@ type Slope = {
 }
 
 type TreeCount = {
-    Count: int
+    Count: int64
     Position: Position option
 }
 
 let countTree (forest: Forest) position =
-    if forest.[position.Row].[position.Column] = '#' then 1 else 0
+    match forest.[position.Row].[position.Column] with
+    | '#' -> 1
+    | _ -> 0
+    |> int64
 
 let move (forest: Forest) slope position =
     let row = position.Row + slope.Rise
@@ -37,15 +40,21 @@ let countTreeAndMove (forest: Forest) slope treeCount =
         let newPosition = move forest slope position
         { Count = count; Position = newPosition }
 
-let rec traverse slope treeCount (forest: Forest) =
+let rec traverse (forest: Forest) treeCount slope =
     let newTreeCount = countTreeAndMove forest slope treeCount
     match newTreeCount.Position with
     | None -> newTreeCount.Count
-    | Some _ -> traverse slope newTreeCount forest
+    | Some _ -> traverse forest newTreeCount slope
 
 let slope = { Rise = 1; Run = 3 }
-
-let solve = traverse slope { Count = 0; Position = Some { Row = 0; Column = 0 } }
+let slopes = [|
+    { Rise = 1; Run = 1 }
+    { Rise = 1; Run = 3 }
+    { Rise = 1; Run = 5 }
+    { Rise = 1; Run = 7 }
+    { Rise = 2; Run = 1 }
+|]
+let initialCount = { Count = int64(0); Position = Some { Row = 0; Column = 0 } }
 
 // sample
 // |> Array.fold (countTreeAndMove (Forest sample) { Rise = 1; Run = 3 }) { Count = 0; Position = { Row = 0; Column = 0 } }
