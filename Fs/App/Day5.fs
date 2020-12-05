@@ -1,4 +1,7 @@
 module Day5
+open System.IO
+
+let data = File.ReadAllLines "../../Data/Day5.txt"
 
 let sample = [|
     "FBFBBFFRLR" // row 44, column 5, seat ID 357.

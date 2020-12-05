@@ -6,9 +6,7 @@ open Day5
 
 [<EntryPoint>]
 let main argv =
-    let entries = File.ReadAllLines "../../Data/Day5.txt"
-
-    entries
+    data
     |> maxSeatId
     |> printfn "%i"
     0 // return an integer exit code
