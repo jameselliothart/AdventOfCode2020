@@ -2,13 +2,13 @@
 
 open System
 open System.IO
-open Day4
+open Day5
 
 [<EntryPoint>]
 let main argv =
-    let entries = File.ReadAllLines "../../Data/Day4.txt"
+    let entries = File.ReadAllLines "../../Data/Day5.txt"
 
     entries
-    |> countValidPassports
+    |> maxSeatId
     |> printfn "%i"
     0 // return an integer exit code
