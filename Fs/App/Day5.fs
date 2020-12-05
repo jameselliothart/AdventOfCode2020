@@ -1,7 +1,7 @@
 module Day5
 open System.IO
 
-let data = File.ReadAllLines "../../Data/Day5.txt"
+let data () = File.ReadAllLines "./Data/Day5.txt"
 
 let sample = [|
     "FBFBBFFRLR" // row 44, column 5, seat ID 357.
@@ -62,7 +62,18 @@ let specifySeatNumber (rowRange) (columnRange) (Spec (row, column)) =
 let toSeatId seatNumber =
     ((fst seatNumber) * 8) + (snd seatNumber)
 
+let reservedSeatIds data =
+    data |> Array.map (toSeatSpecification >> specifySeatNumber ROWRANGE COLUMNRANGE >> toSeatId)
+
 let maxSeatId data =
-    data
-    |> Array.map (toSeatSpecification >> specifySeatNumber ROWRANGE COLUMNRANGE >> toSeatId)
-    |> Array.max
+    data |> reservedSeatIds |> Array.max
+
+let allSeatIds rowRange columnRange =
+    [|
+        for row in [rowRange.Low..rowRange.High] do
+            for column in [columnRange.Low..columnRange.High] do
+                toSeatId (row, column)
+    |]
+
+let available data =
+    (set (allSeatIds ROWRANGE COLUMNRANGE) - set (reservedSeatIds data)) |> Seq.toArray
