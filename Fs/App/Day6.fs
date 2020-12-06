@@ -26,9 +26,10 @@ let totalAffirmative data =
     |> fun (StringAccumulator (acc, _)) -> acc
     |> Array.sumBy (Seq.distinct >> Seq.length)
 
-// let totalUnanimousAffirmative data =
-//     data
-//     |> consolidateByBlankLine ""
-//     |>
+let totalUnanimousAffirmative data =
+    data
+    |> consolidateToStringArrByBlankLine ""
+    |> fun (ArrayAccumulator (acc, _)) -> acc
+    |> Array.sumBy (Seq.map set >> Set.intersectMany >> Seq.length)
 
-sample |> totalAffirmative |> printfn "%A"
+sample |> totalUnanimousAffirmative |> printfn "%A"

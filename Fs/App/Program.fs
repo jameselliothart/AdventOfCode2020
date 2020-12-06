@@ -7,6 +7,6 @@ open Day6
 [<EntryPoint>]
 let main argv =
     File.ReadAllLines "../../Data/Day6.txt"
-    |> totalAffirmative
+    |> totalUnanimousAffirmative
     |> printfn "%A"
     0 // return an integer exit code
