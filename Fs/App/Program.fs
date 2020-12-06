@@ -2,11 +2,11 @@
 
 open System
 open System.IO
-open Day5
+open Day6
 
 [<EntryPoint>]
 let main argv =
-    File.ReadAllLines "../../Data/Day5.txt"
-    |> available
+    File.ReadAllLines "../../Data/Day6.txt"
+    |> totalAffirmative
     |> printfn "%A"
     0 // return an integer exit code
