@@ -32,8 +32,11 @@ let consolidate separator appendString batchAccumulator line =
     else
         { batchAccumulator with Builder = (build appendString batchAccumulator.Builder line) }
 
-let consolidateByBlankLine appendString data =
-    [|""|]
+let consolidateData accumulator separator appendString data =
+    [|separator|]
     |> Array.append data
-    |> Array.fold (consolidate "" appendString) { Accumulated = [||]; Builder = StringAccumulator (StringBuilder()) }
+    |> Array.fold (consolidate separator appendString) accumulator
     |> fun a -> a.Accumulated
+
+let consolidateToStringsByBlankLine = consolidateData { Accumulated = [||]; Builder = StringAccumulator (StringBuilder()) } ""
+let consolidateToStringArrByBlankLine = consolidateData { Accumulated = [||]; Builder = ArrayAccumulator [||] } ""

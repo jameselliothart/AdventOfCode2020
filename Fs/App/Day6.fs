@@ -22,12 +22,12 @@ let sample = [|
 
 let totalAffirmative data =
     data
-    |> consolidateByBlankLine ""
+    |> consolidateToStringsByBlankLine ""
     |> Array.sumBy (Seq.distinct >> Seq.length)
 
 // let totalUnanimousAffirmative data =
 //     data
 //     |> consolidateByBlankLine ""
-//     |> 
+//     |>
 
 sample |> totalAffirmative |> printfn "%A"
