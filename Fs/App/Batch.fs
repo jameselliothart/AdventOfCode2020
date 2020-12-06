@@ -1,5 +1,4 @@
 module Batch
-open System.Text
 
 type Accumulator = {
     Accumulator: string array seq
