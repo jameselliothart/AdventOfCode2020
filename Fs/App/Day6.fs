@@ -22,14 +22,14 @@ let sample = [|
 
 let totalAffirmative data =
     data
-    |> consolidateToStringsByBlankLine ""
-    |> fun (StringAccumulator (acc, _)) -> acc
-    |> Array.sumBy (Seq.distinct >> Seq.length)
+    |> consolidate
+    |> Seq.map (fun x -> x |> Array.reduce (+))
+    |> Seq.sumBy (Seq.distinct >> Seq.length)
 
 let totalUnanimousAffirmative data =
     data
-    |> consolidateToStringArrByBlankLine ""
-    |> fun (ArrayAccumulator (acc, _)) -> acc
-    |> Array.sumBy (Seq.map set >> Set.intersectMany >> Seq.length)
+    |> consolidate
+    |> Seq.sumBy (Seq.map set >> Set.intersectMany >> Seq.length)
 
+sample |> totalAffirmative |> printfn "%A"
 sample |> totalUnanimousAffirmative |> printfn "%A"

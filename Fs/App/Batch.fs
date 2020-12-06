@@ -1,41 +1,21 @@
 module Batch
 open System.Text
 
-type Accumulator =
-| StringAccumulator of Accumulated: string array * Builder : StringBuilder
-| ArrayAccumulator of Accumulated: string array array * Builder : string array
+type Accumulator = {
+    Accumulator: string array seq
+    Builder: string array
+}
 
-// type Accumulator = {
-//     Accumulated: string array
-//     Builder: AccumulatorType
-// }
-
-let accumulate = function
-    | StringAccumulator (acc, b) ->
-        let accumulated = [|b.ToString()|] |> Array.append acc
-        StringAccumulator (accumulated, StringBuilder())
-    | ArrayAccumulator (acc, b) ->
-        let accumulated = [|b|] |> Array.append acc
-        ArrayAccumulator (accumulated, [||])
-
-let build appendString accumulator line =
-    let appendLine = sprintf "%s%s" line appendString
-    match accumulator with
-    | StringAccumulator (acc, b) ->
-        StringAccumulator (acc, b.Append(appendLine))
-    | ArrayAccumulator (acc, b) ->
-        ArrayAccumulator (acc, [|appendLine|] |> Array.append b)
-
-let consolidate separator appendString batchAccumulator line =
+let accumulate separator accumulator line =
     if line = separator then
-        accumulate batchAccumulator
+        { Accumulator = [|accumulator.Builder|] |> Seq.append accumulator.Accumulator; Builder = [||] }
     else
-        build appendString batchAccumulator line
+        { accumulator with Builder = [|line|] |> Array.append accumulator.Builder}
 
-let consolidateData accumulator separator appendString data =
+let consolidateData accumulator separator data =
     [|separator|]
     |> Array.append data
-    |> Array.fold (consolidate separator appendString) accumulator
+    |> Array.fold (accumulate separator) accumulator
+    |> fun a -> a.Accumulator
 
-let consolidateToStringsByBlankLine = consolidateData (StringAccumulator ( [||], StringBuilder() )) ""
-let consolidateToStringArrByBlankLine = consolidateData (ArrayAccumulator ( [||], [||] )) ""
+let consolidate = consolidateData { Accumulator = seq [||]; Builder = [||]} ""
