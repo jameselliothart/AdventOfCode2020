@@ -1,42 +1,41 @@
 module Batch
 open System.Text
 
-type AccumulatorType =
-| StringAccumulator of StringBuilder
-| ArrayAccumulator of string array
+type Accumulator =
+| StringAccumulator of Accumulated: string array * Builder : StringBuilder
+| ArrayAccumulator of Accumulated: string array array * Builder : string array
 
-type Accumulator = {
-    Accumulated: string array
-    Builder: AccumulatorType
-}
+// type Accumulator = {
+//     Accumulated: string array
+//     Builder: AccumulatorType
+// }
 
 let accumulate = function
-    | { Accumulated = acc; Builder = StringAccumulator b } ->
+    | StringAccumulator (acc, b) ->
         let accumulated = [|b.ToString()|] |> Array.append acc
-        { Accumulated = accumulated; Builder = StringAccumulator (StringBuilder()) }
-    | { Accumulated = acc; Builder = ArrayAccumulator b } ->
-        let accumulated = b |> Array.append acc
-        { Accumulated = accumulated; Builder = ArrayAccumulator [||] }
+        StringAccumulator (accumulated, StringBuilder())
+    | ArrayAccumulator (acc, b) ->
+        let accumulated = [|b|] |> Array.append acc
+        ArrayAccumulator (accumulated, [||])
 
 let build appendString accumulator line =
     let appendLine = sprintf "%s%s" line appendString
     match accumulator with
-    | StringAccumulator b ->
-        StringAccumulator (b.Append(appendLine))
-    | ArrayAccumulator b ->
-        ArrayAccumulator ([|appendLine|] |> Array.append b)
+    | StringAccumulator (acc, b) ->
+        StringAccumulator (acc, b.Append(appendLine))
+    | ArrayAccumulator (acc, b) ->
+        ArrayAccumulator (acc, [|appendLine|] |> Array.append b)
 
 let consolidate separator appendString batchAccumulator line =
     if line = separator then
         accumulate batchAccumulator
     else
-        { batchAccumulator with Builder = (build appendString batchAccumulator.Builder line) }
+        build appendString batchAccumulator line
 
 let consolidateData accumulator separator appendString data =
     [|separator|]
     |> Array.append data
     |> Array.fold (consolidate separator appendString) accumulator
-    |> fun a -> a.Accumulated
 
-let consolidateToStringsByBlankLine = consolidateData { Accumulated = [||]; Builder = StringAccumulator (StringBuilder()) } ""
-let consolidateToStringArrByBlankLine = consolidateData { Accumulated = [||]; Builder = ArrayAccumulator [||] } ""
+let consolidateToStringsByBlankLine = consolidateData (StringAccumulator ( [||], StringBuilder() )) ""
+let consolidateToStringArrByBlankLine = consolidateData (ArrayAccumulator ( [||], [||] )) ""

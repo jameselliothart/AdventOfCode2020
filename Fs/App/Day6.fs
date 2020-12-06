@@ -23,6 +23,7 @@ let sample = [|
 let totalAffirmative data =
     data
     |> consolidateToStringsByBlankLine ""
+    |> fun (StringAccumulator (acc, _)) -> acc
     |> Array.sumBy (Seq.distinct >> Seq.length)
 
 // let totalUnanimousAffirmative data =
