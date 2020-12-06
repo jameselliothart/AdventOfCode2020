@@ -14,4 +14,8 @@ let consolidate separator appendString batchAccumulator line =
         let appendLine = sprintf "%s%s" line appendString
         { Accumulated = batchAccumulator.Accumulated; Builder = batchAccumulator.Builder.Append(appendLine) }
 
-let consolidateOnBlankLine = consolidate ""
+let consolidateByBlankLine appendString data =
+    [|""|]
+    |> Array.append data
+    |> Array.fold (consolidate "" appendString) { Accumulated = [||]; Builder = StringBuilder() }
+    |> fun a -> a.Accumulated

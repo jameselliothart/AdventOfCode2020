@@ -21,10 +21,8 @@ let sample = [|
 |]
 
 let totalAffirmative data =
-    [|""|]
-    |> Array.append data
-    |> Array.fold (consolidateOnBlankLine "") { Accumulated = [||]; Builder = StringBuilder() }
-    |> fun a -> a.Accumulated
+    data
+    |> consolidateByBlankLine ""
     |> Array.sumBy (Seq.distinct >> Seq.length)
 
 sample |> totalAffirmative |> printfn "%A"
