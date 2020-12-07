@@ -2,11 +2,11 @@
 
 open System
 open System.IO
-open Day6
+open Day7
 
 [<EntryPoint>]
 let main argv =
-    File.ReadAllLines "../../Data/Day6.txt"
-    |> totalUnanimousAffirmative
+    File.ReadAllLines "../../Data/Day7.txt"
+    |> bagsCanContain "shiny gold"
     |> printfn "%A"
     0 // return an integer exit code
