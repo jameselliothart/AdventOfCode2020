@@ -20,7 +20,7 @@ type RuleText = RuleText of string // "1 bright white bag, 2 muted yellow bags."
 type ContentText = ContentText of string // "1 bright white bag" | "2 muted yellow bags."
 type BagLimit = { Color: Color; Number: int }
 type AllowedBags = BagLimit array
-type Rule = { Color: Color; AllowedBags: AllowedBags }
+// type Rule = { Color: Color; AllowedBags: AllowedBags }
 type BagNumber = (int * Color)
 
 let toColorAndRule (specification: string) =
@@ -40,20 +40,6 @@ let toAllowedBags (RuleText text) =
     match text.Split(", ") with
     | [|"no other bags."|] -> [||]
     | specs -> specs |> Array.map (ContentText >> toBagLimit)
-
-// let toRule specification: Rule =
-//     let bagColor, ruleText = specification |> toColorAndRule
-//     { Color = toColor bagColor; AllowedBags = toAllowedBags ruleText }
-
-// let toRules specs = specs |> Array.map toRule
-
-// let getLimit color (rule: Rule) =
-//     rule.AllowedBags |> Array.tryFind (fun l -> l.Color = color) |> Option.map (fun x -> x.Number)
-
-// let allowedIn (rules: Rule []) color =
-//     rules
-//     |> Array.map (fun r -> color, (getLimit color r))
-//     |> Array.filter (fun (_, n) -> Option.isSome n)
 
 let getBagNumber (bagNumbers: BagNumber []) color =
     bagNumbers |> Array.find (fun x -> snd x = color) |> fst
