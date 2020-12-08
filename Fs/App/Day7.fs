@@ -14,6 +14,16 @@ let sample = [|
     "dotted black bags contain no other bags."
 |]
 
+let sample2 = [|
+    "shiny gold bags contain 2 dark red bags."
+    "dark red bags contain 2 dark orange bags."
+    "dark orange bags contain 2 dark yellow bags."
+    "dark yellow bags contain 2 dark green bags."
+    "dark green bags contain 2 dark blue bags."
+    "dark blue bags contain 2 dark violet bags."
+    "dark violet bags contain no other bags."
+|]
+
 type BagColor = BagColor of string // "light red bags"
 type Color = Color of string // "light red"
 type RuleText = RuleText of string // "1 bright white bag, 2 muted yellow bags." | "no other bags."
@@ -88,7 +98,32 @@ let bagsCanContain color data =
     |> Seq.distinctBy fst
     |> Seq.length
 
-// bagsCanContain sample "shiny gold"
+let vectorDot lhVector rhVector =
+    lhVector
+    |> Array.zip rhVector
+    |> Array.sumBy (fun (x,y) -> x*y)
+
+let matrixDot matrix vector =
+    [| for row in matrix -> vectorDot row vector |]
+
+let magnitude vector = vector |> Seq.sum
+
+let getColumn index (matrix: int [] []) = matrix |> Array.map (fun x -> x.[index])
+
+let nonZeros vector =
+    vector |> Array.indexed |> Array.filter (fun (_,x) -> x > 0)
+
+let rec getCapacity (matrix: int [] []) index =
+    seq {
+        for (i,n) in matrix.[index] |> nonZeros do
+            yield n
+            yield (n * (getCapacity matrix i |> magnitude))
+    }
+
+let bagMustContain color data =
+    let bagNumbers, matrix = data |> toRuleMatrix
+    let bagIndex = getBagNumber bagNumbers (Color color)
+    getCapacity matrix bagIndex |> Seq.sum
 
 (*
     [|

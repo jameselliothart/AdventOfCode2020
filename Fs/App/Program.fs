@@ -7,6 +7,6 @@ open Day7
 [<EntryPoint>]
 let main argv =
     File.ReadAllLines "../../Data/Day7.txt"
-    |> bagsCanContain "shiny gold"
+    |> bagMustContain "shiny gold"
     |> printfn "%A"
     0 // return an integer exit code
