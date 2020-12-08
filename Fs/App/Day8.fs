@@ -24,6 +24,8 @@ let parseInstruction (text: string) =
     | [| "nop"; x |] -> Nop ((int)x)
     | _ -> failwith (sprintf "cannot parse %s" text)
 
+let toInstructions text = text |> Array.map parseInstruction
+
 type Accumulator = { ProcessedLines: int array; CurrentLine: int; Accumulation: int }
 
 let incrementLine amount accumulator =
@@ -39,22 +41,39 @@ type BootStatus =
 | Completed of int
 | InProgress
 
-let bootStatus (instructions: string []) accumulator =
+let bootStatus (instructions: Instruction []) accumulator =
     if Array.contains accumulator.CurrentLine accumulator.ProcessedLines then Cycled accumulator.Accumulation
     elif accumulator.CurrentLine >= instructions.Length then Completed accumulator.Accumulation
     else InProgress
 
-let rec boot (instructions: string []) accumulator =
+let rec boot accumulator instructions =
     match bootStatus instructions accumulator with
     | Cycled n -> Cycled n
     | Completed n -> Completed n
     | InProgress ->
-        match parseInstruction instructions.[accumulator.CurrentLine] with
-        | Nop _ -> accumulator |> incrementLine 1 |> boot instructions
-        | Jmp n -> accumulator |> incrementLine n |> boot instructions
-        | Acc n -> accumulator |> incrementLine 1 |> accumulate n |> boot instructions
+        match instructions.[accumulator.CurrentLine] with
+        | Nop _ -> instructions |> boot (accumulator |> incrementLine 1)
+        | Jmp n -> instructions |> boot (accumulator |> incrementLine n)
+        | Acc n -> instructions |> boot (accumulator |> incrementLine 1 |> accumulate n)
 
 let analyze data =
-    { ProcessedLines = [||]; CurrentLine = 0; Accumulation = 0 } |> boot data
+    data |> toInstructions |> boot { ProcessedLines = [||]; CurrentLine = 0; Accumulation = 0 }
+
+let isNopOrJmp = function
+    | (_, Nop _)
+    | (_, Jmp _) -> true
+    | (_, Acc _) -> false
+
+let switchNopJmp = function
+    | Nop n -> Jmp n
+    | Jmp n -> Nop n
+    | Acc n -> Acc n
+
+let allNopOrJmp instructions =
+    instructions |> Array.indexed |> Array.filter isNopOrJmp
+
+let findCompletion data =
+    data
+    |> allNopOrJmp
 
 sample |> analyze |> printfn "%A"
