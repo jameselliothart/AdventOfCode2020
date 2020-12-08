@@ -34,9 +34,21 @@ let incrementLine amount accumulator =
 
 let accumulate amount accumulator = { accumulator with Accumulation = accumulator.Accumulation + amount }
 
+type BootStatus =
+| Cycled of int
+| Completed of int
+| InProgress
+
+let bootStatus (instructions: string []) accumulator =
+    if Array.contains accumulator.CurrentLine accumulator.ProcessedLines then Cycled accumulator.Accumulation
+    elif accumulator.CurrentLine >= instructions.Length then Completed accumulator.Accumulation
+    else InProgress
+
 let rec boot (instructions: string []) accumulator =
-    if Array.contains accumulator.CurrentLine accumulator.ProcessedLines then accumulator.Accumulation
-    else
+    match bootStatus instructions accumulator with
+    | Cycled n -> Cycled n
+    | Completed n -> Completed n
+    | InProgress ->
         match parseInstruction instructions.[accumulator.CurrentLine] with
         | Nop _ -> accumulator |> incrementLine 1 |> boot instructions
         | Jmp n -> accumulator |> incrementLine n |> boot instructions
