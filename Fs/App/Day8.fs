@@ -56,8 +56,10 @@ let rec boot accumulator instructions =
         | Jmp n -> instructions |> boot (accumulator |> incrementLine n)
         | Acc n -> instructions |> boot (accumulator |> incrementLine 1 |> accumulate n)
 
+let defaultBoot = boot { ProcessedLines = [||]; CurrentLine = 0; Accumulation = 0 }
+
 let analyze data =
-    data |> toInstructions |> boot { ProcessedLines = [||]; CurrentLine = 0; Accumulation = 0 }
+    data |> toInstructions |> defaultBoot
 
 let isNopOrJmp = function
     | (_, Nop _)
@@ -65,15 +67,27 @@ let isNopOrJmp = function
     | (_, Acc _) -> false
 
 let switchNopJmp = function
-    | Nop n -> Jmp n
-    | Jmp n -> Nop n
-    | Acc n -> Acc n
+    | (i, Nop n) -> (i, Jmp n)
+    | (i, Jmp n) -> (i, Nop n)
+    | (i, Acc n) -> (i, Acc n)
+
+let isCompleted = function
+    | InProgress
+    | Cycled _ -> false
+    | Completed _ -> true
+
+let tweakInstructions (instructions: Instruction []) tweak =
+    let updatedInstructions = Array.copy instructions
+    Array.set updatedInstructions (fst tweak) (snd tweak)
+    updatedInstructions
 
 let allNopOrJmp instructions =
     instructions |> Array.indexed |> Array.filter isNopOrJmp
 
 let findCompletion data =
-    data
+    let instructions = data |> toInstructions
+    instructions
     |> allNopOrJmp
-
-sample |> analyze |> printfn "%A"
+    |> Seq.map (switchNopJmp >> tweakInstructions instructions >> defaultBoot)
+    |> Seq.filter isCompleted
+    |> Seq.tryHead

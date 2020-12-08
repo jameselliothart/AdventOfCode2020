@@ -7,6 +7,6 @@ open Day8
 [<EntryPoint>]
 let main argv =
     File.ReadAllLines "../../Data/Day8.txt"
-    |> analyze
+    |> findCompletion
     |> printfn "%A"
     0 // return an integer exit code
