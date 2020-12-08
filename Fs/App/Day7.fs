@@ -1,6 +1,4 @@
 module Day7
-open RegexHelpers
-open System.Collections.Generic
 
 let sample = [|
     "light red bags contain 1 bright white bag, 2 muted yellow bags."
