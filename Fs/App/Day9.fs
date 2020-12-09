@@ -43,7 +43,8 @@ let tryfindContiguousSum (xmasNumber: int) data =
     data
     |> Seq.mapi (fun i _ -> data |> Seq.take (i+1))
     |> Seq.takeWhile (fun x -> x |> Seq.sum <= xmasNumber)
-    |> Seq.tryPick (fun ns -> if ns |> Seq.sum = xmasNumber then Some ns else None)
+    |> Seq.tryLast
+    |> Option.bind (fun ns -> if Seq.sum ns = xmasNumber then Some ns else None)
 
 let findContiguousSum (data: int seq) xmasNumber =
     data
@@ -68,5 +69,3 @@ let solve2 (data: string []) =
 
 let result = solve2 sample
 printfn "%A" result
-
-// tryfindContiguousSum 127 (seq [15; 25; 47; 40; ]);;
