@@ -7,6 +7,6 @@ open Day9
 [<EntryPoint>]
 let main argv =
     File.ReadAllLines "../../Data/Day9.txt"
-    |> findNonXmasNumber 25
+    |> solve2
     |> printfn "%A"
     0 // return an integer exit code
