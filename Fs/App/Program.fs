@@ -2,11 +2,11 @@
 
 open System
 open System.IO
-open Day8
+open Day9
 
 [<EntryPoint>]
 let main argv =
-    File.ReadAllLines "../../Data/Day8.txt"
-    |> findCompletion
+    File.ReadAllLines "../../Data/Day9.txt"
+    |> findNonXmasNumber 25
     |> printfn "%A"
     0 // return an integer exit code
