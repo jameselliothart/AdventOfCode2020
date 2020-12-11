@@ -54,14 +54,14 @@ let adjacentOccupied seatLayout rowNum colNum =
     |> Seq.filter (fun s -> Option.exists occupied s)
     |> Seq.length
 
-let checkSeat occupancyCheck (seatLayout: Seat [] []) seat =
+let checkSeat occupancyCheck occupiedTolerance (seatLayout: Seat [] []) seat =
     match seat with
     | Floor -> NoChange
     | Empty (r, c) ->
         if occupancyCheck seatLayout r c = 0 then BecomeOccupied (r,c)
         else NoChange
     | Occupied (r, c) ->
-        if occupancyCheck seatLayout r c >= 4 then BecomeEmpty (r,c)
+        if occupancyCheck seatLayout r c >= occupiedTolerance then BecomeEmpty (r,c)
         else NoChange
 
 let checkSeats checkSeat seatLayout =
@@ -110,5 +110,5 @@ let rec getStableLayout round seatLayout =
 let solve data =
     data
     |> toSeatLayout
-    |> getStableLayout (round (checkSeats (checkSeat adjacentOccupied)) occupy)
+    |> getStableLayout (round (checkSeats (checkSeat adjacentOccupied 4)) occupy)
     |> totalOccupied
