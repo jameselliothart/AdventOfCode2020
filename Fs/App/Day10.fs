@@ -1,15 +1,14 @@
 module Day10
 
 (*
-(0), 1, 4, 5, 6, 7, 10, 11, 12, 15, 16, 19, (22)    skip none
-(0), 1, 4, 6, 7, 10, 11, 12, 15, 16, 19, (22)       skip 5
-(0), 1, 4, 7, 10, 11, 12, 15, 16, 19, (22)          skip 5, 6
-(0), 1, 4, 7, 10, 12, 15, 16, 19, (22)              skip 5, 6, 11
-(0), 1, 4, 6, 7, 10, 12, 15, 16, 19, (22)           skip 5, 11
-(0), 1, 4, 5, 7, 10, 11, 12, 15, 16, 19, (22)       skip 6
-(0), 1, 4, 5, 7, 10, 12, 15, 16, 19, (22)           skip 6, 11
-(0), 1, 4, 5, 6, 7, 10, 12, 15, 16, 19, (22)        skip 11
-1 + 3 + 3 + 1 = 8
+(0), 1, 4, 5, 6, 7, 10, 11, 12, 15, 16, 19, (22)    skip none       2 choose 0 * 1 choose 0
+(0), 1, 4, 5, 6, 7, 10, 12, 15, 16, 19, (22)        skip 11         2 choose 0 * 1 choose 1
+(0), 1, 4, 6, 7, 10, 11, 12, 15, 16, 19, (22)       skip 5          2 choose 1 * 1 choose 0
+(0), 1, 4, 5, 7, 10, 11, 12, 15, 16, 19, (22)       skip 6          2 choose 1 * 1 choose 0
+(0), 1, 4, 6, 7, 10, 12, 15, 16, 19, (22)           skip 5, 11      2 choose 1 * 1 choose 1
+(0), 1, 4, 5, 7, 10, 12, 15, 16, 19, (22)           skip 6, 11      2 choose 1 * 1 choose 1
+(0), 1, 4, 7, 10, 11, 12, 15, 16, 19, (22)          skip 5, 6       2 choose 2 * 1 choose 0
+(0), 1, 4, 7, 10, 12, 15, 16, 19, (22)              skip 5, 6, 11   2 choose 2 * 1 choose 1
 *)
 
 let sample1 = [|
@@ -82,9 +81,19 @@ let rec factorial = function
     | x when x = 0 -> 1
     | x -> x*factorial(x-1)
 
-let choose k n =
+let choose n k =
     (n |> factorial) / ((k |> factorial) * ((n - k) |> factorial))
 
-// let solve2 data =
-//     let adapters, outlets = data |> toAdaptersAndOutlets
+let sumOfChoices n =
+    let maxToChoose = if n > 2 then 2 else n
+    [0..maxToChoose] |> List.sumBy (choose n)
 
+let solve2 data =
+    data
+    |> toJoltageDifferences
+    |> Array.map string
+    |> Array.reduce (fun x y -> sprintf "%s%s" x y)
+    |> fun s -> s.Split('3')
+    |> Array.filter (fun x -> x.Length > 1)
+    |> Array.map ((fun x -> sumOfChoices (x.Length - 1)) >> int64)
+    |> Array.reduce (*)
