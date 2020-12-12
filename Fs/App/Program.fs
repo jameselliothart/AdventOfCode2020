@@ -2,11 +2,11 @@
 
 open System
 open System.IO
-open Day11
+open Day12
 
 [<EntryPoint>]
 let main argv =
-    File.ReadAllLines "../../Data/Day11.txt"
-    |> solve2
+    File.ReadAllLines "../../Data/Day12.txt"
+    |> solve
     |> printfn "%A"
     0 // return an integer exit code
