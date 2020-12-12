@@ -112,3 +112,37 @@ let solve data =
     |> toSeatLayout
     |> getStableLayout (round (checkSeats (checkSeat adjacentOccupied 4)) occupy)
     |> totalOccupied
+
+let isSeat = function
+    | Empty _ | Occupied _ -> true
+    | Floor -> false
+
+let firstVisibleSeats (seatLayout: Seat [] []) rowNum colNum =
+    let north = seatLayout |> Array.take rowNum |> Array.rev |> Array.map (fun r -> r.[colNum])
+    let south = seatLayout |> Array.skip (rowNum+1) |> Array.map (fun r -> r.[colNum])
+    let east = seatLayout.[rowNum] |> Array.skip (colNum+1)
+    let west = seatLayout.[rowNum] |> Array.take colNum |> Array.rev
+    let northeast = Seq.initInfinite (fun i -> (rowNum-1-i,colNum+1+i))
+    let northwest = Seq.initInfinite (fun i -> (rowNum-1-i,colNum-1-i))
+    let southeast = Seq.initInfinite (fun i -> (rowNum+1+i,colNum+1+i))
+    let southwest = Seq.initInfinite (fun i -> (rowNum+1+i,colNum-1-i))
+    let cardinal =
+        [|north;south;east;west|] |> Array.map (Array.tryFind isSeat >> Option.exists occupied) |> Array.filter id |> Array.length
+    let diagonals =
+        [|northeast;northwest;southeast;southwest|]
+        |> Array.map (fun s ->
+            s
+            |> Seq.map (fun (r, c) -> seatLayout |> Array.tryItem r |> Option.bind (fun row -> row |> Array.tryItem c))
+            |> Seq.takeWhile Option.isSome
+            |> Seq.map Option.get
+            |> Seq.tryFind isSeat
+            |> Option.exists occupied
+        )
+        |> Array.filter id |> Array.length
+    cardinal + diagonals
+
+let solve2 data =
+    data
+    |> toSeatLayout
+    |> getStableLayout (round (checkSeats (checkSeat firstVisibleSeats 5)) occupy)
+    |> totalOccupied

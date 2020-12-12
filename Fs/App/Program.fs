@@ -7,6 +7,6 @@ open Day11
 [<EntryPoint>]
 let main argv =
     File.ReadAllLines "../../Data/Day11.txt"
-    |> solve
+    |> solve2
     |> printfn "%A"
     0 // return an integer exit code
