@@ -50,7 +50,8 @@ let handle writer command =
 let sumMemory (memory: Map<int, int64>) =
     memory |> Map.toSeq |> Seq.sumBy snd
 
-data
-|> Array.map (parse)
-|> Array.fold handle { Mask = Mask "X"; MemoryMap = Map.empty }
-|> fun w -> sumMemory w.MemoryMap
+let solve data =
+    data
+    |> Array.map (parse)
+    |> Array.fold handle { Mask = Mask "X"; MemoryMap = Map.empty }
+    |> fun w -> sumMemory w.MemoryMap
