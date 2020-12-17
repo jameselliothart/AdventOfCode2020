@@ -30,10 +30,12 @@ class Field(defaultdict):
     def __init__(self):
         super().__init__(lambda: INACTIVE)
 
+    def active(self):
+        return [p for p, s in self.items() if s == ACTIVE]
+
     def points_to_transition(self, get_neighbors):
-        tracked = list(self.keys())
-        tracked.extend(itertools.chain.from_iterable([get_neighbors(point) for point in self.keys()]))
-        return tracked
+        tracked = set(self.active())
+        return tracked.union(itertools.chain.from_iterable([get_neighbors(point) for point in tracked]))
 
     def get_transition(self, point, get_neighbors):
         active_neighbors = [p for p in get_neighbors(point) if self[p] == ACTIVE]
@@ -47,16 +49,26 @@ class Field(defaultdict):
             self.update(t)
 
     def count_active(self):
-        return len([p for p, s in self.items() if s == ACTIVE])
+        return len(self.active())
 
 Point = namedtuple('Point', 'x y z')
 
+def d(n): return [n-1, n, n+1]
+
 def neighboring(point):
-    def d(n): return [n-1, n, n+1]
     return [
         Point(dx, dy, dz)
         for dx in d(point.x) for dy in d(point.y) for dz in d(point.z)
         if (dx,dy,dz) != (point.x, point.y, point.z)
+    ]
+
+HyperPoint = namedtuple('HyperPoint', 'x y z w')
+
+def hyper_neighboring(point):
+    return [
+        HyperPoint(dx, dy, dz, dw)
+        for dx in d(point.x) for dy in d(point.y) for dz in d(point.z) for dw in d(point.w)
+        if (dx,dy,dz,dw) != (point.x, point.y, point.z, point.w)
     ]
 
 if __name__ == "__main__":
@@ -64,9 +76,9 @@ if __name__ == "__main__":
 
     for x, row in enumerate(DATA):
         for y, value in enumerate(row):
-            field[Point(x,y,0)] = value
+            field[HyperPoint(x,y,0,0)] = value
 
     print(field.count_active())
     for i in range(0, 6):
-        field.transition(field.get_transitions(neighboring))
+        field.transition(field.get_transitions(hyper_neighboring))
         print(i, field.count_active())
