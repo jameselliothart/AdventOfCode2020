@@ -1,13 +1,20 @@
 module Day18
 
 type Symbol =
-| Number of int
+| Number of int64
 | Add
 | Multiply
 
 type Calculation =
-| Operand of int
-| Operation of (int -> int)
+| Operand of int64
+| Operation of (int64 -> int64)
+
+type ExpressionElement =
+| Symbol of Symbol
+| Begin
+| End
+
+type Calculator = Calculation -> Symbol -> Calculation
 
 let calculate soFar next =
     match (soFar, next) with
@@ -17,17 +24,27 @@ let calculate soFar next =
     | (Operand x, Add) -> Operation ((+) x)
     | (Operand x, Multiply) -> Operation ((*) x)
 
-let rec accumulate calculator soFar expression =
+let toNumber = function
+    | Operand x -> Number x
+    | Operation _ -> failwith "cannot extract number from operation"
+
+let rec accumulate (calculator: Calculator) soFar expression =
     match expression with
-    | [] -> soFar
     | next :: rest ->
-        let calculation = calculator soFar next
-        accumulate calculator calculation rest
+        match next with
+        | End -> ([soFar |> toNumber |> Symbol] @ rest)
+        | Begin -> accumulate calculator soFar (accumulate calculator (Operation id) rest)
+        | Symbol s ->
+            let calculation = calculator soFar s
+            accumulate calculator calculation rest
+    | [] -> [soFar |> toNumber |> Symbol]
 
 let toSymbol = function
-    | x when x = '+' -> Add
-    | x when x = '*' -> Multiply
-    | x -> x |> string |> int |> Number
+    | x when x = '(' -> Begin
+    | x when x = ')' -> End
+    | x when x = '+' -> Add |> Symbol
+    | x when x = '*' -> Multiply |> Symbol
+    | x -> x |> string |> int64 |> Number |> Symbol
 
 let toSymbols symbolMaker text =
     text
@@ -35,58 +52,20 @@ let toSymbols symbolMaker text =
     |> Seq.map symbolMaker
     |> List.ofSeq
 
-"1 + 2 * 3 + 4 * 5 + 6"
-|> toSymbols toSymbol
-|> accumulate calculate (Operation id)
+let solve text =
+    text
+    |> toSymbols toSymbol
+    |> accumulate calculate (Operation id)
 
+let extractOperand = function
+    | Symbol (Number x) -> x
+    | _ -> failwith "cannot extract from Operation"
 
-// type Expression =
-// | CharacterSequence of Character seq
-// | Subexpression of Expression
+let data () = System.IO.File.ReadAllLines "./Data/Day18.txt"
 
-// let toCharacter = function
-//     | x when x = '+' -> Add
-//     | x when x = '*' -> Multiply
+let sample = "((2 + 4 * 9) * (6 + 9 * 8 + 6) + 6) + 2 + 4 * 2"  // 13632
 
-//     | x -> x |> int |> Digit
+// sample |> solve
 
-// type Expression = { SoFar: int; Operator: int -> int -> int; Next: Expression option }
-
-// let calculate stored operator next =
-//     operator stored next
-
-// let calculator stored operator next =
-//     match next with
-//     | Digit n -> calculate (operator stored n) operator
-//     | Add -> calculate stored (+)
-//     | Multiply -> calculate stored (*)
-
-
-
-// let number expression =
-//     let mutable level = 0
-//     [
-//         for x in expression do
-//             if x = '(' then level <- level + 1
-//             elif x = ')' then level <- level - 1
-//             else yield (level, x)
-//     ]
-
-// let reduce acc numbered =
-//     let max = numbered |> List.maxBy fst |> fst
-//     [
-//         for (n,d) in numbered do
-//             if n < max then yield (n,d)
-//             else
-//     ]
-
-// "1 + 2 * 3 + 4 * 5 + 6".Replace(" ", "")
-// |> List.ofSeq
-// |> number
-
-
-// "1 + (2 * 3) + (4 * (5 + 6))".Replace(" ", "")
-// |> List.ofSeq
-// |> number
-// |> List.maxBy fst
-// |> fst
+data ()
+|> Array.sumBy (solve >> List.head >> extractOperand)
